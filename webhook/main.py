@@ -22,30 +22,7 @@ from google.appengine.ext import ndb
 
 app = Flask(__name__)
 
-def requires_auth(f):
-    @wraps(f)
-    def decorated(*args, **kwards):
-        auth = request.authorization
-        if not auth or not check_auth(auth.username, auth.password):
-            return authenticate()
-        return f(*args, **kwards)
-    return decorated
-
-def check_auth(username, password):
-
-    uname="myuser"
-    pwd="mypassword"
-        
-    return username == uname and password == pwd
-
-def authenticate():
-    return Response(
-    'Invalid login.\n'
-    'Invalid login.', 401,
-    {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
 @app.route('/webhook/', methods=['POST'])
-@requires_auth
 def handle():
     req = request.get_json(silent=True, force=True)
     #print 'Request:'
@@ -64,7 +41,7 @@ def handle():
     return r
 
 def getResponse(topic):
-    #Get the synonym 
+    #Get the synonym
     synonym_text = getSynonym(topic)
 
     action_text = getActionText(synonym_text)
@@ -79,23 +56,23 @@ def buildReply(info):
 def getSynonym(query_text):
     synonym_key = ndb.Key('Synonym', query_text)
     synonyms = Synonym.query_synonym(synonym_key).fetch(1)
-    
+
     synonym_text = ""
     for synonym in synonyms:
         synonym_text = synonym.synonym
-        break 
-    
+        break
+
     return synonym_text
 
 def getActionText(synonym_text):
     synonym_text = synonym_text.strip()
     topic_key = ndb.Key('Topic', synonym_text)
     topics = Topic.query_topic(topic_key).fetch(1)
-    
+
     action_text = ""
     for topic in topics:
         action_text = topic.action_text
-        
+
     if action_text == None or action_text == "":
         return ""
 
@@ -109,15 +86,14 @@ def server_error(e):
 
 class Topic(ndb.Model):
     action_text = ndb.StringProperty()
-    
+
     @classmethod
     def query_topic(cls, ancestor_key):
         return cls.query(ancestor=ancestor_key)
-    
+
 class Synonym(ndb.Model):
     synonym = ndb.StringProperty()
-    
+
     @classmethod
     def query_synonym(cls, ancestor_key):
         return cls.query(ancestor=ancestor_key)
-    
