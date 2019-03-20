@@ -22,7 +22,28 @@ from google.appengine.ext import ndb
 
 app = Flask(__name__)
 
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwards):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwards)
+    return decorated
+
+def check_auth(username, password):
+    uname="myuser"
+    pwd="mypassword"      
+    return username == uname and password == pwd
+
+def authenticate():
+    return Response(
+    'Invalid login.\n'
+    'Invalid login.', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
 @app.route('/webhook/', methods=['POST'])
+@requires_auth
 def handle():
     req = request.get_json(silent=True, force=True)
     #print 'Request:'
