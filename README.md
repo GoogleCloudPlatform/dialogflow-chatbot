@@ -22,7 +22,7 @@
 
 1. Notebooks to process and store data
 2. Webhook for deploying chatbot on AppEngine
-3. Angular chatbot UI AppEngine application
+3. Angular chatbot UI AppEngine application (Original code taken from [repo](https://github.com/AngularFirebase/59-angular-chatbot-dialogflow) special thanks to Jeff Delaney)
 
 ### Notebooks to process and store data
 
